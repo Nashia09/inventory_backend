@@ -22,9 +22,13 @@ async function bootstrap() {
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
+  console.log('CORS enabled for origin(s):', allowedOrigins.length ? allowedOrigins : 'http://localhost:3001');
   app.enableCors({
-    origin: allowedOrigins.length ? allowedOrigins : [/^https?:\/\/localhost:\d+$/],
+    origin: allowedOrigins.length ? allowedOrigins : 'http://localhost:3001',
     credentials: true,
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    optionsSuccessStatus: 204,
   });
 
   app.useGlobalPipes(

@@ -50,4 +50,10 @@ export class ProductsService {
     const res = await this.productModel.findByIdAndDelete(id);
     if (!res) throw new NotFoundException('Product not found');
   }
+
+  // Added: find by barcode for scanner support
+  async findByBarcode(barcode: string): Promise<Product | null> {
+    if (!barcode) return null;
+    return this.productModel.findOne({ barcode });
+  }
 }

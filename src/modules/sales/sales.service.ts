@@ -27,7 +27,7 @@ export class SalesService {
     for (let i = 0; i < dto.productsSold.length; i++) {
       const item = dto.productsSold[i];
       const product = productDocs[i];
-      if (product.quantity < item.quantity) {
+      if (product.stockQuantity < item.quantity) {
         throw new BadRequestException(`Insufficient stock for product ${product.name}`);
       }
       totalAmount += item.unitPrice * item.quantity;
@@ -37,7 +37,9 @@ export class SalesService {
     await Promise.all(
       dto.productsSold.map((item) =>
         this.productsService.update(item.productId, {
-          quantity: (productDocs.find((p) => (p as any)._id?.toString() === item.productId)?.quantity || 0) - item.quantity,
+          stockQuantity:
+            (productDocs.find((p) => (p as any)._id?.toString() === item.productId)?.stockQuantity || 0) -
+            item.quantity,
         }),
       ),
     );
@@ -75,5 +77,37 @@ export class SalesService {
     const sale = await this.saleModel.findById(id);
     if (!sale) throw new NotFoundException('Sale not found');
     return sale;
+  }
+
+  // Added: dashboard stats for today
+  async todayStatsForUser(user: { userId: string; role: string }) {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const end = new Date();
+    const filter: any = { createdAt: { $gte: start, $lte: end } };
+    if (user?.role === 'Cashier') {
+      filter.cashierId = new Types.ObjectId(user.userId);
+    }
+    const sales = await this.saleModel.find(filter).lean();
+    const transactions = sales.length;
+    const revenue = sales.reduce((sum, s: any) => sum + (s.totalAmount || 0), 0);
+    return { transactions, revenue };
+  }
+
+  // Added: recent sales list
+  async recentForUser(user: { userId: string; role: string }, limit = 5) {
+    const filter: any = {};
+    if (user?.role === 'Cashier') {
+      filter.cashierId = new Types.ObjectId(user.userId);
+    }
+    const sales = await this.saleModel.find(filter).sort({ createdAt: -1 }).limit(limit).lean();
+    const recentSales = sales.map((s: any) => ({
+      id: String(s._id),
+      transaction_id: String(s._id).slice(-6),
+      created_at: s.createdAt,
+      item_count: (s.productsSold || []).reduce((sum: number, i: any) => sum + (i.quantity || 0), 0),
+      total_amount: s.totalAmount || 0,
+    }));
+    return { recentSales };
   }
 }

@@ -11,17 +11,23 @@ export class Product {
   @Prop({ required: true, unique: true, index: true })
   sku: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'Category', required: true })
-  categoryId: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'Category' })
+  categoryId?: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Supplier', required: true })
-  supplierId: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'Supplier' })
+  supplierId?: Types.ObjectId;
 
   @Prop({ required: true })
   price: number;
 
+  @Prop()
+  barcode?: string;
+
   @Prop({ required: true, min: 0 })
-  quantity: number;
+  stockQuantity: number;
+
+  @Prop({ default: 0, min: 0 })
+  minStockLevel?: number;
 
   @Prop()
   description?: string;

@@ -28,6 +28,17 @@ export class SalesController {
     return this.salesService.findAll(query);
   }
 
+  @Get('dashboard/today')
+  @Roles(Role.Admin, Role.Manager, Role.Cashier)
+  today(@Req() req: any) {
+    return this.salesService.todayStatsForUser(req.user);
+  }
+
+  @Get('dashboard/recent')
+  @Roles(Role.Admin, Role.Manager, Role.Cashier)
+  recent(@Req() req: any) {
+    return this.salesService.recentForUser(req.user);
+  }
   @Get(':id')
   @Roles(Role.Admin, Role.Manager)
   findOne(@Param('id') id: string) {

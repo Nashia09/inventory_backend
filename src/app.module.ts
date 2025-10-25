@@ -1,23 +1,26 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigModule } from '@nestjs/config';
-import { ConfigService } from '@nestjs/config';
+// Using global ValidationPipe configured in main.ts
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ProductsModule } from './modules/products/products.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { SuppliersModule } from './modules/suppliers/suppliers.module';
 import { SalesModule } from './modules/sales/sales.module';
+import { CustomersModule } from './modules/customers/customers.module';
+import { CreditPaymentsModule } from './modules/credit-payments/credit-payments.module';
+import { StockMovementsModule } from './modules/stock-movements/stock-movements.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGODB_URI'),
-      }),
       inject: [ConfigService],
+      useFactory: async (config: ConfigService) => ({
+        uri: config.get<string>('MONGODB_URI'),
+      }),
     }),
     UsersModule,
     AuthModule,
@@ -25,6 +28,10 @@ import { SalesModule } from './modules/sales/sales.module';
     CategoriesModule,
     SuppliersModule,
     SalesModule,
+    CustomersModule,
+    CreditPaymentsModule,
+    StockMovementsModule,
   ],
+  // Providers not needed here; global pipes configured in main.ts
 })
 export class AppModule {}

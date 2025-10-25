@@ -5,11 +5,14 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
+import { Get, Req } from '@nestjs/common';
+import { UsersService } from '../users/users.service';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private usersService: UsersService) {}
 
   @Post('register')
   @ApiResponse({ status: 201, description: 'User registered successfully' })
@@ -45,5 +48,18 @@ export class AuthController {
       path: '/',
     });
     return { accessToken };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth('access-token')
+  @ApiResponse({ status: 200, description: 'Current user profile' })
+  async profile(@Req() req: any) {
+    const user = await this.usersService.findById(req.user.userId);
+    if (!user) {
+      return { message: 'User not found' };
+    }
+    return { user };
   }
 }

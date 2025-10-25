@@ -25,4 +25,19 @@ export class UsersService {
   async findById(id: string): Promise<User | null> {
     return this.userModel.findById(id);
   }
+
+  async findAll(): Promise<User[]> {
+    return this.userModel.find();
+  }
+
+  async update(id: string, update: Partial<User>): Promise<User | null> {
+    const updated = await this.userModel.findByIdAndUpdate(id, update, { new: true });
+    if (!updated) throw new NotFoundException('User not found');
+    return updated;
+  }
+
+  async remove(id: string): Promise<void> {
+    const res = await this.userModel.findByIdAndDelete(id);
+    if (!res) throw new NotFoundException('User not found');
+  }
 }
