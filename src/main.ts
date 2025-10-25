@@ -18,13 +18,21 @@ async function bootstrap() {
 
   // Enable CORS for frontend, allow credentials (cookies)
   const originsEnv = configService.get<string>('FRONTEND_ORIGIN') || '';
-  const allowedOrigins = originsEnv
+  const envOrigins = originsEnv
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
-  console.log('CORS enabled for origin(s):', allowedOrigins.length ? allowedOrigins : 'http://localhost:3001');
+  const defaultOrigins = ['http://localhost:3001'];
+  const allowedOrigins = [...new Set([...defaultOrigins, ...envOrigins])];
+
+  console.log('CORS allowed origins:', allowedOrigins);
+
   app.enableCors({
-    origin: allowedOrigins.length ? allowedOrigins : 'http://localhost:3001',
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error(`CORS blocked for origin: ${origin}`), false);
+    },
     credentials: true,
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
