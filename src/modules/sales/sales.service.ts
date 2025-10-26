@@ -79,6 +79,21 @@ export class SalesService {
     return sale;
   }
 
+  // Access-controlled fetch: allow Cashier to access only their own sale
+  async findOneAccessible(id: string, user: { userId: string; role: string }) {
+    const sale = await this.saleModel.findById(id);
+    if (!sale) throw new NotFoundException('Sale not found');
+
+    if (user?.role === 'Cashier') {
+      if (String((sale as any).cashierId) !== String(user.userId)) {
+        // Hide existence details for unauthorized access
+        throw new NotFoundException('Sale not found');
+      }
+    }
+
+    return sale;
+  }
+
   // Added: dashboard stats for today
   async todayStatsForUser(user: { userId: string; role: string }) {
     const start = new Date();

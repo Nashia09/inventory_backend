@@ -17,9 +17,16 @@ export class ProductsService {
   async findAll(query: any): Promise<{ data: Product[]; total: number }> {
     const { page = 1, limit = 10, search, categoryId, supplierId } = query;
     const filter: any = {};
+
     if (search) {
-      filter.name = { $regex: search, $options: 'i' };
+      const regex = new RegExp(search, 'i');
+      filter.$or = [
+        { name: regex },
+        { sku: regex },
+        { barcode: regex },
+      ];
     }
+
     if (categoryId) filter.categoryId = categoryId;
     if (supplierId) filter.supplierId = supplierId;
 

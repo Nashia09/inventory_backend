@@ -40,8 +40,8 @@ export class SalesController {
     return this.salesService.recentForUser(req.user);
   }
   @Get(':id')
-  @Roles(Role.Admin, Role.Manager)
-  findOne(@Param('id') id: string) {
-    return this.salesService.findOne(id);
+  @Roles(Role.Admin, Role.Manager, Role.Cashier)
+  findOne(@Param('id') id: string, @Req() req: any) {
+    return this.salesService.findOneAccessible(id, req.user);
   }
 }
