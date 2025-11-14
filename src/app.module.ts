@@ -11,6 +11,7 @@ import { SalesModule } from './modules/sales/sales.module';
 import { CustomersModule } from './modules/customers/customers.module';
 import { CreditPaymentsModule } from './modules/credit-payments/credit-payments.module';
 import { StockMovementsModule } from './modules/stock-movements/stock-movements.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { StockMovementsModule } from './modules/stock-movements/stock-movements.
     CustomersModule,
     CreditPaymentsModule,
     StockMovementsModule,
+    AnalyticsModule,
   ],
   // Providers not needed here; global pipes configured in main.ts
 })
