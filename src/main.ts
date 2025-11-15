@@ -22,7 +22,10 @@ async function bootstrap() {
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
-  const defaultOrigins = ['http://localhost:3001'];
+  const nodeEnv = configService.get<string>('NODE_ENV') || process.env.NODE_ENV || 'development';
+  const defaultOrigins = nodeEnv === 'development'
+    ? ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:5173', 'http://127.0.0.1:5173']
+    : [];
   const allowedOrigins = [...new Set([...defaultOrigins, ...envOrigins])];
 
   console.log('CORS allowed origins:', allowedOrigins);

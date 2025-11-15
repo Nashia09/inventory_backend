@@ -20,7 +20,7 @@ export class AnalyticsController {
         today: { revenue: 1500, transactions: 25, profit: 300 },
         yesterday: { revenue: 1200, transactions: 20, profit: 250 },
         weekly: { revenue: 8500, transactions: 150, profit: 1700 },
-        products: { total: 150, lowStock: 15 },
+        products: { total: 150, lowStock: 15, outOfStock: 5 },
         users: { total: 25, activeToday: 8 }
       }
     }

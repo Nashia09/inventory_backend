@@ -63,9 +63,17 @@ export class AnalyticsService {
     const yesterdayProfit = yesterdayRevenue * profitRate;
     const weeklyProfit = weeklyRevenue * profitRate;
 
-    const [totalProducts, lowStockProducts, totalUsers, activeToday] = await Promise.all([
+    const [totalProducts, lowStockProducts, outOfStockProducts, totalUsers, activeToday] = await Promise.all([
       this.productModel.countDocuments(),
-      this.productModel.countDocuments({ stockQuantity: { $lt: 10 } }),
+      this.productModel.countDocuments({
+        $expr: {
+          $and: [
+            { $gt: ['$stockQuantity', 0] },
+            { $lte: ['$stockQuantity', { $ifNull: ['$minStockLevel', 0] }] },
+          ],
+        },
+      }),
+      this.productModel.countDocuments({ stockQuantity: 0 }),
       this.userModel.countDocuments(),
       this.userModel.countDocuments({ lastLoginAt: { $gte: today } }),
     ]);
@@ -74,7 +82,7 @@ export class AnalyticsService {
       today: { revenue: todayRevenue, transactions: todaySales.length, profit: todayProfit },
       yesterday: { revenue: yesterdayRevenue, transactions: yesterdaySales.length, profit: yesterdayProfit },
       weekly: { revenue: weeklyRevenue, transactions: weeklySales.length, profit: weeklyProfit },
-      products: { total: totalProducts, lowStock: lowStockProducts },
+      products: { total: totalProducts, lowStock: lowStockProducts, outOfStock: outOfStockProducts },
       users: { total: totalUsers, activeToday },
     };
   }
