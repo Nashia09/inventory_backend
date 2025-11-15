@@ -30,6 +30,7 @@ export class AuthController {
       sameSite: 'lax',
       secure: false,
       path: '/',
+      maxAge: 7 * 60 * 60 * 1000,
     });
     return result;
   }
@@ -46,6 +47,7 @@ export class AuthController {
       sameSite: 'lax',
       secure: false,
       path: '/',
+      maxAge: 7 * 60 * 60 * 1000,
     });
     return { accessToken };
   }
