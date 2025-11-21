@@ -29,6 +29,12 @@ export class CreateProductDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
+  @IsNumber()
+  @Min(0)
+  cost?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
   barcode?: string;
 

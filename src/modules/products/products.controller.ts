@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -25,6 +25,7 @@ export class ProductsController {
       sku: o.sku,
       barcode: o.barcode,
       price: o.price,
+      cost: o.cost,
       stock_quantity: o.stockQuantity,
       min_stock_level: o.minStockLevel,
       description: o.description,
@@ -87,6 +88,13 @@ export class ProductsController {
   @Patch(':id')
   @Roles(Role.Admin, Role.Manager)
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
+    const payload = this.normalizeIncomingDto(updateProductDto);
+    return this.productsService.update(id, payload).then((p) => this.toClientProduct(p));
+  }
+
+  @Put(':id')
+  @Roles(Role.Admin, Role.Manager)
+  updatePut(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     const payload = this.normalizeIncomingDto(updateProductDto);
     return this.productsService.update(id, payload).then((p) => this.toClientProduct(p));
   }

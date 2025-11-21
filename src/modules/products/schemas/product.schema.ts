@@ -20,6 +20,9 @@ export class Product {
   @Prop({ required: true })
   price: number;
 
+  @Prop({ default: 0, min: 0 })
+  cost?: number;
+
   @Prop()
   barcode?: string;
 
